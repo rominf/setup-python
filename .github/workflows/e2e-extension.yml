@@ -40,3 +40,30 @@ jobs:
       - name: Run C extension
         run: |
           ${{ steps.setup-python.outputs.python-path }} -c "import helloworld; helloworld.say_hello('world')"
+  python-pyo3-extension:
+    name: Test building pyo3 extension (Python ${{ matrix.python-version}}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        id: setup-python
+        uses: ./
+        with:
+          python-version: |
+            3.9
+            pypy3.9
+          cache: 'pip'
+      - name: Build pyo3 extension
+        uses: PyO3/maturin-action@v1
+        with:
+          args: --release --interpreter 'python3.9 pypy3.9'
+          working-directory: __tests__/data/pyo3_extension/
+      - name: Install pyo3 extension
+        run: pip install --no-index --find-links __tests__/data/pyo3_extension/target/wheels/ helloworld
+      - name: Run pyo3 extension
+        run: |
+          ${{ steps.setup-python.outputs.python-path }} -c "import helloworld; helloworld.say_hello('world')"
