@@ -1,0 +1,42 @@
+name: e2e-extension
+
+on:
+  pull_request:
+    paths-ignore:
+      - '**.md'
+  push:
+    branches:
+      - main
+      - releases/*
+    paths-ignore:
+      - '**.md'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+jobs:
+  python-c-extension:
+    name: Test building C extension (Python ${{ matrix.python-version}}, ${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Setup Python
+        id: setup-python
+        uses: ./
+        with:
+          python-version: |
+            3.9
+            pypy3.9
+          cache: 'pip'
+      - name: Install dependencies
+        run: pip install setuptools
+      - name: Build C extension
+        run: pip install .
+        working-directory: __tests__/data/c_extension/
+      - name: Run C extension
+        run: |
+          ${{ steps.setup-python.outputs.python-path }} -c "import helloworld; helloworld.say_hello('world')"

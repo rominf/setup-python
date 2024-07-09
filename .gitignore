@@ -1,3 +1,7 @@
+# Ignore build/ and .egg-info/ directories of C Python extension
+__tests__/data/c_extension/build/
+__tests__/data/c_extension/helloworld.egg-info/
+
 # Ignore node_modules, ncc is used to compile nodejs modules into a single file in the releases branch
 node_modules/
 __tests__/runner/*
