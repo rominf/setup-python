@@ -93,6 +93,10 @@ export async function findPyPyVersion(
     // https://cmake.org/cmake/help/latest/module/FindPython3.html#module:FindPython3
     core.exportVariable('Python3_ROOT_DIR', installDir);
     core.exportVariable('PKG_CONFIG_PATH', pythonLocation + '/lib/pkgconfig');
+    // https://learn.microsoft.com/en-us/cpp/build/reference/linking?view=msvc-170#link-environment-variables
+    if (IS_WINDOWS) {
+      core.exportVariable('LIB', pythonLocation + '/libs');
+    }
     core.addPath(pythonLocation);
     core.addPath(_binDir);
   }
